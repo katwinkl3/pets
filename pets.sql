@@ -34,7 +34,7 @@ CREATE TABLE users (
 	description 		text,
 	image 				text not null default 'http://lorempixel.com/400/200/people/',
 	FOREIGN key (homeid) REFERENCES homes(id),
-	unique(id,name)
+	unique(id,name) 
 );
 
 
@@ -52,7 +52,7 @@ CREATE TABLE admins (
 CREATE TABLE PetOwners (
 	oid				serial primary key,
 	owner_name		text not null,
-	foreign key (oid, owner_name) references users(id,name) on delete cascade
+	foreign key (oid, owner_name) references users(id,name) on delete cascade on update cascade
 );
 
 
