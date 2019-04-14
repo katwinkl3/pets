@@ -121,7 +121,6 @@ class AddServiceForm extends Component {
     }
 
 
-
     onRateChange (value) {
       this.props.form.setFieldsValue({
          rate: value

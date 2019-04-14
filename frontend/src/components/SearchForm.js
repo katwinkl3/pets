@@ -42,19 +42,26 @@ class SearchForm extends Component {
 
 
 class Search extends Component {
+  shouldComponentUpdate(nextProps, nextState) {
+   if (this.props.location.pathname == nextProps.location.pathname && JSON.stringify({a: this.state.currentResultsDisplay}) === JSON.stringify({a: nextProps.currentResultsDisplay})) {
+     return false;
+   } else {
+     return true;
+   }
+ }
+
   constructor(props) {
     super(props);
-    console.log(props);
     this.myRef = React.createRef();
     this.state = {
      marks: {
         0: 10,
-        100: 150
+        100: 100
       },
       location: {},
       results:[],
       totalResultsDisplay:[],
-      currentResultsDisplay:[],
+      currentResultsDisplay: props.currentResultsDisplay,
       current: 1,
       service: 'Pet Boarding',
       pettype: 'Dog',
@@ -117,6 +124,7 @@ class Search extends Component {
           results = data
           console.log(results)
           this.displayResults(results)
+         this.props.onSearchFilter(selection.service,selection.startdate, selection.enddate, this.state.currentResultsDisplay);
         })
 
       .catch(function(err) {
@@ -144,7 +152,8 @@ displayResults = (results) => {
               className="results-card"
                bordered={false}
                style={{ width: 240 }}
-               cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+               cover={<img alt="example" src="https://i.pinimg.com/originals/74/6d/ab/746dab017f2d7f3c5da3aa7b1995d706.jpg" />}
+
               >
              <Card.Meta
                title= {
@@ -165,8 +174,11 @@ displayResults = (results) => {
              </Col>
              <Col span={12}>
              <Card className="results-card"
+               hoverable
                bordered={false}
                style={{ width: 240 }}
+               cover={<img alt="example" src="https://us.123rf.com/450wm/warrengoldswain/warrengoldswain1603/warrengoldswain160300008/54380987-hipster-man-petting-and-rubbing-his-dog-loving-affection-relationship-bond-between-owner-and-pet.jpg?ver=6" />}>
+               onClick={() => this.cardClick(array[i+1].cid)}
                cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}>
              <Card.Meta
                title= {
@@ -382,7 +394,7 @@ displayResults = (results) => {
           <Form.Item>
             <Slider
               marks={this.state.marks}
-              defaultValue={150}
+              defaultValue={100}
               tipFormatter={(value) => `$${value}`}
               onChange={this.onRateChange.bind(this)}/>
           </Form.Item>

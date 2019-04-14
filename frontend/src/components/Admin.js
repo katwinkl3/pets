@@ -9,12 +9,140 @@ const { Column, ColumnGroup } = Table;
 class Admin extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      losscaretakers: [],
+      allupcomingbids: [],
+    }
   }
+  componentWillMount () {
+      var losscaretakers = new Request("http://localhost:3001/getLossCaretakers", {
+        method: 'GET',
+        headers: new Headers({'Content-Type': 'application/json'}),
+      });
+      var upcomingbidrequest = new Request("http://localhost:3001/getUpcomingBids", {
+        method: 'POST',
+        headers: new Headers({'Content-Type': 'application/json'}),
+        credentials: 'include'
+      });
+      fetch(losscaretakers)
+          .then((response) =>
+            response.json())
+            .then((data) => {
+              this.setState({
+                losscaretakers: data
+              })
+              console.log(this.state.losscaretakers)
+            })
+          .catch(function(err) {
+            console.log(err);
+          })
+        fetch(upcomingbidrequest)
+            .then((response) =>
+              response.json())
+              .then((upcomingbiddata) => {
+                this.setState({
+                  allupcomingbids: upcomingbiddata
+                })
+              })
+            .catch(function(err) {
+              console.log(err);
+            })
+          }
+
+          handleDelete = (key) => {
+            this.setState({
+              deletebid: key
+            })
+            console.log(key);
+            console.log(this.state.deletebid);
+            this.nextDelete();
+          }
+
+          nextDelete = () => {
+            let data = {
+              deletebid: this.state.deletebid,
+            }
+            var request = new Request("http://localhost:3001/deleteBid", {
+              method: 'DELETE',
+              headers: new Headers({'Content-Type': 'application/json'}),
+              body: JSON.stringify(data)
+            });
+
+            fetch(request)
+            .then((response) => {
+              console.log(request)
+              response.json()
+              .then((data) => {
+                console.log(data)
+                this.updateBidTable();
+              })
+            })
+            .catch(function(err) {
+              console.log(err);
+            })
+          }
+
+          updateBidTable () {
+              var losscaretakers = new Request("http://localhost:3001/getLossCaretakers", {
+                method: 'GET',
+                headers: new Headers({'Content-Type': 'application/json'}),
+              });
+              var upcomingbidrequest = new Request("http://localhost:3001/getUpcomingBids", {
+                method: 'POST',
+                headers: new Headers({'Content-Type': 'application/json'}),
+                credentials: 'include'
+              });
+              fetch(losscaretakers)
+                  .then((response) =>
+                    response.json())
+                    .then((data) => {
+                      this.setState({
+                        losscaretakers: data
+                      })
+                      console.log(this.state.losscaretakers)
+                    })
+                  .catch(function(err) {
+                    console.log(err);
+                  })
+                fetch(upcomingbidrequest)
+                    .then((response) =>
+                      response.json())
+                      .then((upcomingbiddata) => {
+                        this.setState({
+                          allupcomingbids: upcomingbiddata
+                        })
+                      })
+                    .catch(function(err) {
+                      console.log(err);
+                    })
+                  }
   render() {
       return (
         <div>
-        <h1 className="admin-title">List of inactive bids</h1>
-        <Table >
+        <h1 className="admin-title">List of caretakers who are making a loss for all their services</h1>
+        <Table dataSource={this.state.losscaretakers}>
+        <Column
+          title="Caretaker ID"
+          dataIndex="caretakerid"
+          key="caretakerid"
+        />
+        <Column
+          title="Caretaker Name"
+          dataIndex="name"
+          key="name"
+        />
+        <Column
+          title="Action"
+          key="action"
+          render={(text, record) => (
+            <span>
+              <a href={"mailto:" + record.email}>Alert</a>
+            </span>
+          )}
+        />
+        </Table>
+        <h1 className="admin-title">List of all bids</h1>
+        <Table dataSource={this.state.allupcomingbids}>
         <Column
           title="Bid Date"
           dataIndex="bidtimestamp"
@@ -32,8 +160,13 @@ class Admin extends Component {
         />
         <Column
         title="Type"
-        dataIndex="typeofpet"
-        key="typeofpet"
+        dataIndex="pettype"
+        key="pettype"
+        />
+        <Column
+        title="Breed"
+        dataIndex="breed"
+        key="breed"
         />
         <Column
         title="Service"
@@ -42,13 +175,31 @@ class Admin extends Component {
         />
         <Column
         title="Start Date"
-        dataIndex="bidstartdate"
-        key="bidstartdate"
+        dataIndex="servicestartdate"
+        key="servicestartdate"
         />
         <Column
         title="End Date"
-        dataIndex="bidenddate"
-        key="bidenddate"
+        dataIndex="serviceenddate"
+        key="serviceenddate"
+        />
+        {/*<Column
+        title="Address"
+        dataIndex="address"
+        key="address"
+        />*/}
+
+        <Column
+        title="Action"
+        key="action"
+        render={(text, record) => (
+          <span>
+          <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelete(record.bidid)}>
+            <a href="javascript:;">Remove</a>
+          </Popconfirm>
+          </span>
+
+        )}
         />
         </Table>
         </div>

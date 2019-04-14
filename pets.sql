@@ -20,7 +20,7 @@ CREATE TABLE Homes (
 	id 				serial PRIMARY key,
 	address 		VARCHAR(100) not null unique,
 	postcode		bigint not null,
-	suburb			VARCHAR(100) 
+	suburb			VARCHAR(100) not null
 );
 
 
@@ -131,7 +131,7 @@ create table review (
 	reviewerid			serial not null,
 	HistoryID			serial not null,
 	ratings				int not null,
-	foreign key (historyid) REFERENCES history(historyid)
+	foreign key (historyid) REFERENCES history(historyid) on delete cascade
 );
 
 

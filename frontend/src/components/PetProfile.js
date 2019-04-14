@@ -65,9 +65,9 @@ function PetProfile({ history, match}) {
         <Row>
         <Col span={12}>
         <div className = "pet-profile-pic">
-        <img className = "pet-profile-img" src="https://cdn.pixabay.com/photo/2016/12/13/05/15/puppy-1903313__340.jpg" alt="pet image1"/>
-        <img className = "pet-profile-img" src="https://images.unsplash.com/photo-1529429617124-95b109e86bb8?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80" alt="pet image2"/>
-        <img className = "pet-profile-img" src="https://i5.wal.co/dfw/4ff9c6c9-a77b/k2-_864ef38f-4c7e-427e-8a3c-7415272c6919.v1.jpg" alt="pet image3"/>
+        <img className = "pet-profile-img" src="https://upload.wikimedia.org/wikipedia/commons/8/86/Maltese_puppy.jpeg" alt="pet image1"/>
+        <img className = "pet-profile-img" src="https://i.pinimg.com/originals/07/ad/bb/07adbb578d159d2bde3eaaf89cbdcf14.jpg" alt="pet image2"/>
+        <img className = "pet-profile-img" src="https://irp-cdn.multiscreensite.com/c096e00e/dms3rep/multi/mobile/cute-maltese-dog%20(330%20x%20296)-min-330x296.jpg" alt="pet image3"/>
         </div>
         </Col>
 

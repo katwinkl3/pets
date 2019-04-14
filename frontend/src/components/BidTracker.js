@@ -25,27 +25,37 @@ class BidTracker extends Component {
     this.state = {
       upcomingbid: [],
       pendingbid: [],
+      pastbidtorate: [],
       pastbid: [],
       deletebid: 0,
       acceptbid: 0,
       editing: false,
       value: 0,
+      petowneridrating: '',
     }
   };
 
   // Gets data from the table when the page first launches
   componentWillMount () {
       var upcomingbidrequest = new Request("http://localhost:3001/getUpcomingBids", {
-        method: 'GET',
-        headers: new Headers({'Content-Type': 'application/json'})
+        method: 'POST',
+        headers: new Headers({'Content-Type': 'application/json'}),
+        credentials: 'include'
       });
       var pendingbidrequest = new Request("http://localhost:3001/getPendingBids", {
-        method: 'GET',
-        headers: new Headers({'Content-Type': 'application/json'})
+        method: 'POST',
+        headers: new Headers({'Content-Type': 'application/json'}),
+        credentials: 'include'
+      });
+      var pastbidtoraterequest = new Request("http://localhost:3001/getPastBidsToRate", {
+        method: 'POST',
+        headers: new Headers({'Content-Type': 'application/json'}),
+        credentials: 'include'
       });
       var pastbidrequest = new Request("http://localhost:3001/getPastBids", {
-        method: 'GET',
-        headers: new Headers({'Content-Type': 'application/json'})
+        method: 'POST',
+        headers: new Headers({'Content-Type': 'application/json'}),
+        credentials: 'include'
       });
           fetch(pendingbidrequest)
               .then((response) =>
@@ -71,7 +81,17 @@ class BidTracker extends Component {
               .catch(function(err) {
                 console.log(err);
               })
-
+              fetch(pastbidtoraterequest)
+                  .then((response) =>
+                    response.json())
+                    .then((pastbidtoratedata) => {
+                      this.setState({
+                        pastbidtorate: pastbidtoratedata,
+                      })
+                    })
+                  .catch(function(err) {
+                    console.log(err);
+                  })
           fetch(pastbidrequest)
               .then((response) =>
                 response.json())
@@ -85,7 +105,6 @@ class BidTracker extends Component {
               })
   }
 
-  // TO BE DONE: when rejected button is clicked
   handleDelete = (key) => {
     this.setState({
       deletebid: key
@@ -118,7 +137,6 @@ class BidTracker extends Component {
     })
   }
 
-  // TO BE DONE: when accepted button is clicked. SetState changes to the BidID after second click idk WHYYY
   handleAccept = (key) => {
     this.state.acceptbid = key
     this.nextAccept();
@@ -150,19 +168,26 @@ class BidTracker extends Component {
     this.updateBidTable();
   }
 
-  // TO BE DONE: front end needs to reflect the updated data. it now only do this after 2 clicks....
   updateBidTable = () => {
     var upcomingbidrequest = new Request("http://localhost:3001/getUpcomingBids", {
-      method: 'GET',
-      headers: new Headers({'Content-Type': 'application/json'})
+      method: 'POST',
+      headers: new Headers({'Content-Type': 'application/json'}),
+      credentials: 'include'
     });
     var pendingbidrequest = new Request("http://localhost:3001/getPendingBids", {
-      method: 'GET',
-      headers: new Headers({'Content-Type': 'application/json'})
+      method: 'POST',
+      headers: new Headers({'Content-Type': 'application/json'}),
+      credentials: 'include'
+    });
+    var pastbidtoraterequest = new Request("http://localhost:3001/getPastBidsToRate", {
+      method: 'POST',
+      headers: new Headers({'Content-Type': 'application/json'}),
+      credentials: 'include'
     });
     var pastbidrequest = new Request("http://localhost:3001/getPastBids", {
-      method: 'GET',
-      headers: new Headers({'Content-Type': 'application/json'})
+      method: 'POST',
+      headers: new Headers({'Content-Type': 'application/json'}),
+      credentials: 'include'
     });
         fetch(pendingbidrequest)
             .then((response) =>
@@ -188,7 +213,17 @@ class BidTracker extends Component {
             .catch(function(err) {
               console.log(err);
             })
-
+            fetch(pastbidtoraterequest)
+                .then((response) =>
+                  response.json())
+                  .then((pastbidtoratedata) => {
+                    this.setState({
+                      pastbidtorate: pastbidtoratedata,
+                    })
+                  })
+                .catch(function(err) {
+                  console.log(err);
+                })
         fetch(pastbidrequest)
             .then((response) =>
               response.json())
@@ -202,12 +237,12 @@ class BidTracker extends Component {
             })
   }
 
-  handleRateChange = (value) => {
-  console.log(value);
+  handleRate = (key) => {
+    this.state.petowneridrate = key
+    console.log(this.state.petowneridrate);
 }
 
   render() {
-     const { value } = this.state;
     return (
       <div className="bidtracker">
       <h1 className = "bidtracker-title">Your Bids</h1>
@@ -268,7 +303,7 @@ class BidTracker extends Component {
           <a href="javascript:;">Reject</a>
         </Popconfirm>
         <Divider type="vertical" />
-          <a href={"mailto:" + "hello123@gmail.com"}>Email</a>
+          <a href={"mailto:" + record.email}>Email</a>
         </span>
 
       )}
@@ -326,13 +361,13 @@ class BidTracker extends Component {
           <Divider type="vertical" />
           <a href="javascript:;">Reject</a>
           <Divider type="vertical" />
-          <a href={"mailto:" + "hello123@gmail.com"}>Email</a>
+          <a href={"mailto:" + record.email}>Email</a>
         </span>
       )}
     />
   </Table>
-      <h2 className = "bidtracker-subtitle">Past</h2>
-      <Table dataSource={this.state.pastbid}>
+      <h2 className = "bidtracker-subtitle">Rate your Past Events</h2>
+      <Table dataSource={this.state.pastbidtorate}>
       <Column
         title="Bid Date"
         dataIndex="bidtimestamp"
@@ -377,13 +412,56 @@ class BidTracker extends Component {
       title="Ratings"
       key="action"
       render={(text, record) => (
-        <a href="/rating">Rate</a>
+        <a href={"/rating/" + record.historyid} onClick={() => this.handleRate(record.historyid)}>Rate</a>
         )}
       // render={(text, record) => (
       //  <Rate onChange={this.handleRateChange} value={value} />
       // )}
     />
 
+  </Table>
+      <h2 className = "bidtracker-subtitle">Past Events</h2>
+      <Table dataSource={this.state.ratedpastbid}>
+      <Column
+        title="Bid Date"
+        dataIndex="bidtimestamp"
+        key="bidtimestamp"
+      />
+      <Column
+        title="Pet Owner"
+        dataIndex="owner_name"
+        key="owner_name"
+      />
+      <Column
+        title="Pet Name"
+        dataIndex="name"
+        key="name"
+      />
+    <Column
+      title="Type"
+      dataIndex="pettype"
+      key="pettype"
+    />
+    <Column
+      title="Breed"
+      dataIndex="breed"
+      key="breed"
+    />
+    <Column
+      title="Service"
+      dataIndex="service"
+      key="service"
+    />
+    <Column
+      title="Start Date"
+      dataIndex="servicestartdate"
+      key="servicestartdate"
+    />
+    <Column
+      title="End Date"
+      dataIndex="serviceenddate"
+      key="serviceenddate"
+    />
   </Table>
     </div>
 

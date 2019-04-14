@@ -11,7 +11,9 @@ import AddBid from './components/AddBid';
 import Logo from './image/pet-bay-sands-logo.svg';
 import UserProfile from './components/UserProfile';
 import BidTracker from './components/BidTracker';
-import AddService from './components/AddService';
+import AddService from './components/SignupAsCaretakerForm';
+import AddServiceInEditProfile from './components/AddServiceForm';
+
 import PetProfile from './components/PetProfile';
 import EditProfile from './components/EditProfile';
 import Admin from './components/Admin';
@@ -37,7 +39,8 @@ class App extends Component {
       collapsed: true,
       cookie: null,
       isAuthenticated: document.cookie ? true : false,
-      isCareTaker: false
+      isCareTaker: false,
+      searchFilters: {serviceType: '', startdate: '', enddate: ''}
     }
   }
 
@@ -82,7 +85,8 @@ class App extends Component {
          .then((data) => {
            console.log(data.isValidBidder);
            if (data.isValidBidder) {
-             this.props.history.push('/add-bid');
+             let urlToPush = history.location.pathname + '/add-bid';
+             history.push(urlToPush);
            } else {
              message.error('You must be a pet owner to make a bid.');
            }
@@ -121,6 +125,13 @@ class App extends Component {
      })
    }
 
+   onSearchFilter(serviceType, startdate, enddate, disp) {
+     this.setState({
+       searchFilters: {serviceType: serviceType, startdate: startdate,  enddate: enddate},
+       currentResultsDisplay: disp,
+     })
+   }
+
 
   render() {
     return (
@@ -140,6 +151,9 @@ class App extends Component {
             <Menu>
               <Menu.Item key="0">
                   <NavLink to="/my-user-profile" style={{textDecoration: 'none'}}> Edit Profile </NavLink>
+              </Menu.Item>
+              <Menu.Item key="0">
+                  <NavLink to="/my-user-profile" style={{textDecoration: 'none'}}> View Profile </NavLink>
               </Menu.Item>
               <Menu.Divider/>
               <Menu.Item key="3" onClick={this.logout.bind(this)}>Logout</Menu.Item>
@@ -163,8 +177,12 @@ class App extends Component {
           </div>
 
           <Switch>
-          <Route exact path="/" component={SearchForm} />
-
+          <Route exact path="/"
+          render={({props}) =>
+            <SearchForm
+              onSearchFilter={this.onSearchFilter.bind(this)}
+              currentResultsDisplay= {this.state.currentResultsDisplay}
+              />}/>
           <Route
             exact path="/signup"
             render={({props}) => <Signup onGoToAddPet= {this.onGoToAddPet.bind(this)} onGoToAddService={this.onGoToAddService.bind(this)}/>}/>
@@ -177,8 +195,12 @@ class App extends Component {
             onGoToAddService={this.onGoToAddService.bind(this)}
             />
          <PrivateRoute exact path="/add-service" component={AddService} authenticated={this.state.isAuthenticated}/>
-        {/*<PrivateRoute exact path="/add-bid" component={AddBid} authenticated={this.state.isAuthenticated}/>*/}
-        <Route exact path='/add-bid' component={AddBid}/>
+        <PrivateRoute
+          exact path="/user-profile/:id/add-bid"
+          authenticated={this.state.isAuthenticated}
+          component={AddBid}
+          searchFilters={this.state.searchFilters}
+          />
          <Route
             exact path="/user-profile/:id"
             render={({props}) => <UserProfile goToAddBid={this.goToAddBid.bind(this)}/>}/>
@@ -186,9 +208,10 @@ class App extends Component {
          <Route
             path="/login"
             render={({props}) => <Login loginSuccess= {this.loginSuccess.bind(this)}/>}/>
-         <Route path="/rating" component={Rating} />
+         <Route path="/rating/:id" component={Rating} />
+          <Route path="/admin" component={Admin} />
+         <Route path="/add-service-edit" component={AddServiceInEditProfile} />
         {/* <PrivateRoute exact path="/bid-tracker" component={BidTracker} authenticated={this.state.isAuthenticated}/>*/}
-
         <Route exact path ="/bid-tracker"component={BidTracker} />
         <Route exact path ="/edit_profile"component={EditProfile} />
          <PrivateRoute exact path="/pet-profile" component={PetProfile} authenticated={this.state.isAuthenticated}/>
