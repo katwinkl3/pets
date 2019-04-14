@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import './Admin.css';
-import { Table, Divider, Tag, Input, Button, Popconfirm, Form } from 'antd';
+import { Table, Popconfirm,} from 'antd';
 
 const { Column, ColumnGroup } = Table;
 

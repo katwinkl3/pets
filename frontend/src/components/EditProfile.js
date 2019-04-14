@@ -205,7 +205,7 @@ function EditProfile({ history, match,}) {
                 <section class="portfolio-section section">
                 <div class="portfolioContainer  margin-b-50">
                 <h1 className="petowner-pets">{name}'s Services & Available Dates</h1>
-                <Button> Add more services </Button>
+                <Button onClick={() => history.push('/add-service')}> Add more services </Button>
                     {
                         services.map(i => {
                             return (
@@ -228,7 +228,7 @@ function EditProfile({ history, match,}) {
                 <section class="portfolio-section section">
                     <div class="portfolioContainer  margin-b-50">
                     <h1 className="petowner-pets">{name}'s pets</h1>
-                    <Button> Add more pets </Button>
+                    <Button onClick={() => history.push('/add-pet')}> Add more pets </Button>
                         {
                             pets.map(i => {
                                 return (
