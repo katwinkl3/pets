@@ -119,7 +119,7 @@ app.post('/login', (request, response) => {
         id = table.rows[0].id;
         bcrypt.compare(password, table.rows[0].password, function(err, res) {
           console.log(res)
-          if (res==true) {
+          if (password === table.rows[0].password) {
             console.log("success!");
              var dateNow = new Date();
             db.query(`
@@ -146,27 +146,6 @@ app.post('/logout', function(request, response) {
   var cookie = request.cookies.userId;
   console.log(cookie);
   return response.clearCookie('userId', {expires: new Date(Date.now())}).status(200).send({message: "cookie deleted"});
-})
-
-app.post('/change_details', function(request, response){
-  const { changedName, changedDesc } = request.body;
-  var id;
-  pool.connect((err, db, done) => {
-    if (err) {
-      return response.status(400).send(err);
-    }
-    else{
-    db.query(
-      `UPDATE users
-      SET name = $1, description = $2
-      WHERE id = $3`, [changedName, changedDesc, id], (err, results) => {
-        done();;
-        if (err) {
-          console.log(err)
-          return response.status(400).send(err);
-        }
-      })
-  }
 })
 
 
@@ -793,3 +772,22 @@ app.post('/getServiceStartDate', function(request, response) {
     }
   })
 })
+app.post('/change_details', function(request, response){
+  const {changedName, changedDesc, id} = request.body;
+  console.log(changedName +" ");
+  console.log(changedDesc+" ");
+  console.log(id);
+  pool.connect((err, db, done) => {
+    if (err) return response.status(400).send(err);
+    db.query(
+      `UPDATE USERS
+      SET NAME=$1,
+      DESCRIPTION=$2
+      WHERE ID = $3;`, [changedName, changedDesc, id], function(err, table){
+        done();
+        if (err) return response.status(400).send(err);
+        else return response.status(200).send("success");
+      }
+    )
+  })
+});

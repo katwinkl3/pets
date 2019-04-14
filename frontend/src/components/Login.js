@@ -33,7 +33,6 @@ function LoginPage({ history , form, loginSuccess}) {
   const { getFieldDecorator } = form;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [description, setDescription] = useState('');
   const [anyErrors, setError] = useState('');
 
   const emailChanged = useCallback((e) => {

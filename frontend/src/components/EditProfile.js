@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { withRouter } from "react-router";
-import { AutoComplete, Button, Input } from 'antd';
+import { message, Button, Input } from 'antd';
 
 import './UserProfile.css';
 
@@ -109,17 +109,24 @@ async function fetchCareTaker(type, id, setError, setServices) {
 
 }
 
-function changeDetails(changedName, changedDesc){
+function changeDetails(changedName, changedDesc, id){
     return fetch('http://localhost:3001/change_details',{
         headers: { 'Content-Type': 'application/json'},
         method: 'POST',
         body: JSON.stringify({
-            changedName, changedDesc
+            changedName, changedDesc, id
         })
     })
 }
 
-function EditProfile({ history, match, goToAddBid}) {
+async function fetchChangedDetails(changedName, changedDesc, id, setError){
+    try{
+        let resp = await changeDetails(changedName, changedDesc, id)
+        let data = await resp.json()
+    } catch(e) {setError(JSON.stringify(e))}
+}
+
+function EditProfile({ history, match,}) {
     const [name, setName] = useState('');
     const [changedName, setChangedName] = useState('');
     const [type, setType] = useState('');
@@ -143,7 +150,8 @@ function EditProfile({ history, match, goToAddBid}) {
 
     const submit = useCallback(async (e) =>{
         try {
-            changeDetails(changedName, changedDesc, id)
+            fetchChangedDetails(changedName, changedDesc, id)
+            message.success("Successfuly changed");
         } catch(e){
             setError("unexpected error")
         }
