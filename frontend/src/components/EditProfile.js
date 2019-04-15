@@ -280,7 +280,7 @@ function EditProfile({ history, match,}) {
                 <section class="portfolio-section section">
                     <div class="portfolioContainer  margin-b-50">
                     <h1 className="petowner-pets">{name}'s pets</h1>
-                    <Button onClick={() => history.push('/add-pet')}> Add more pets </Button>
+                    <Button className="email-button" onClick={() => history.push('/add-pet')}> Add more pets </Button>
                         {
                             pets.map(i => {
                                 return (

@@ -3,6 +3,8 @@ import { withRouter } from "react-router";
 import { Route, NavLink } from 'react-router-dom';
 import './UserProfile.css';
 import PetProfile from './PetProfile';
+import { Card } from 'antd';
+const { Meta } = Card;
 
 function getUserProfile(id) {
     return fetch('http://localhost:3001/user/profile', {
@@ -224,15 +226,18 @@ function UserProfile({ history, match, goToAddBid}) {
                             pets.map(i => {
                                 return (
                                     <div class="p-item web-design">
-                                    <p>Pet Name: {i['name']}</p>
-                                    <p>Pet Breed: {i['breed']}</p>
-                                    <p>Pet Age: {i['age']}</p>
 
                                         {/* Links to pet page */}
-                                        <NavLink to={"/PetProfile/"+i['oid']+'/'+i['name']} style={{textDecoration: 'none'}}>
-                                            <img src={i['image1']} alt="" /> </NavLink>
-                                        <Route exact path={"/pet_profile/:id/:"} component={PetProfile}></Route>
-                                        
+                                        <Card
+                                            hoverable
+                                            cover={<img src={i['image1']} alt="" />}
+                                            onClick={() => history.push('/pet-profile')}
+                                        >
+                                            <Meta 
+                                            title = {i['name']}
+                                            description = {i['age'] + " years old " + i['breed']}
+                                            />
+                                        </Card>
                                     </div>
                                 )
                             })
