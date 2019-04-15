@@ -774,9 +774,6 @@ app.post('/getServiceStartDate', function(request, response) {
 })
 app.post('/change_details', function(request, response){
   const {changedName, changedDesc, id} = request.body;
-  console.log(changedName +" ");
-  console.log(changedDesc+" ");
-  console.log(id);
   pool.connect((err, db, done) => {
     if (err) return response.status(400).send(err);
     db.query(
@@ -791,3 +788,47 @@ app.post('/change_details', function(request, response){
     )
   })
 });
+
+app.post('/delete_service', function(request, response){
+  const {serviceName, caretakerID, startDate, endDate} = request.body;
+  pool.connect((err, db, done) => {
+    if (err) return response.status(400).send(err);
+    db.query(
+      `SELECT * FROM SERVICES
+       WHERE CID=$1
+      `, [caretakerID], (err, table) =>{
+        if (err) return response.status(400).send(err);
+        if (table.rows.length < 2) return response.status(403).send({ status: "failed", message: "Cannot have less than 1 service" })
+        db.query(
+          `DELETE FROM SERVICES 
+          WHERE CID=$1
+          AND SERVICE=$2 AND STARTDATE=$3 AND ENDDATE=$4;`, [caretakerID, serviceName, startDate, endDate], (err, res) => {
+            if (err) return response.status(400).send({status:"failed",message: err});
+          }
+        )
+      }
+    )
+  })
+})
+
+app.post('/delete_pets', function(request, response){
+  const {petName, petOwnerID} = request.body;
+  pool.connect((err, db, done) => {
+    if (err) return response.status(400).send({status:"failed",message: err});
+    db.query(
+      `SELECT * FROM PETS
+       WHERE OID=$1
+      `, [petOwnerID], (err, table) =>{
+        if (err) return response.status(400).send({status:"failed",message: err});
+        if (table.rows.length < 2) return response.status(403).send({ status: "failed", message: "Cannot have less than 1 pet" })
+        db.query(
+          `DELETE FROM PETS
+          WHERE OID=$1
+          AND NAME=$2;`, [petOwnerID, petName], (err, res) => {
+            if (err) return response.status(400).send({status:"failed",message: err});
+          }
+        )
+      }
+    )
+  })
+})

@@ -126,6 +126,26 @@ async function fetchChangedDetails(changedName, changedDesc, id, setError){
     } catch(e) {setError(JSON.stringify(e))}
 }
 
+function deleteService(serviceName, id, startDate, endDate){
+    return fetch('http://localhost:3001/delete_pets', {
+        headers: { 'Content-Type': 'application/json'},
+        method: 'POST',
+        body: JSON.stringify({
+            serviceName, id, startDate, endDate
+        })
+    })
+}
+
+function deletePet(petName, id){
+    return fetch('http://localhost:3001/delete_pets', {
+        headers: { 'Content-Type': 'application/json'},
+        method: 'POST',
+        body: JSON.stringify({
+            petName, id
+        })
+    })
+}
+
 function EditProfile({ history, match,}) {
     const [name, setName] = useState('');
     const [changedName, setChangedName] = useState('');
@@ -139,6 +159,11 @@ function EditProfile({ history, match,}) {
     const [services, setServices] = useState([]);
     const [pageEmail, setPageEmail] = useState([]);
     const email = localStorage.getItem("email");
+    const [petName, setPetName] = useState([]);
+    const [serviceName, setServiceName] = useState([]);
+    const [startDate, setStartDate] = useState([]);
+    const [endDate, setEndDate] = useState([]);
+    const popup =  useState();
 
     const nameChanged = useCallback((e) => {
         setChangedName(e.target.value);
@@ -151,9 +176,33 @@ function EditProfile({ history, match,}) {
     const submit = useCallback(async (e) =>{
         try {
             fetchChangedDetails(changedName, changedDesc, id)
-            message.success("Successfuly changed");
         } catch(e){
             setError("unexpected error")
+        }
+    })
+
+
+    const deleteSelectedService = useCallback(async (e) => {
+        try {
+            let resp = await deleteService(serviceName, id, startDate, endDate)
+            let data = await resp.json()
+            if (data.status === 'failed') message.warning(data.message);
+            else message.success("Successfully Deleted");
+        } catch(e){
+            message.warning(e)
+        }
+    })
+
+    const deleteSelectedPet = useCallback(async (e) => {
+        try {
+            let resp = await deletePet(petName, id)
+            let data = await resp.json()
+            console.log(data.status+" ");
+            console.log(data.message);
+            if (data.status === 'failed') message.warning(data.message);
+            else message.success("Successfully Deleted");
+        } catch(e){
+            message.warning(e)
         }
     })
 
@@ -186,14 +235,16 @@ function EditProfile({ history, match,}) {
                                     placeholder={name}
                                     onChange={nameChanged}
                                 />
-                                <h4 class="profile-desc">Description</h4>
+                                <h3 class="profile-desc"><b>Description</b></h3>
                                 <Input
                                     style={{ width: 200 }}
                                     placeholder={desc}
                                     onChange={descChanged}
                                 />
                             </div>
-                            <Button onClick={submit}> Submit </Button>
+                            <div class="intro">
+                                <Button className="email-button" onClick={submit}> Submit </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -205,16 +256,17 @@ function EditProfile({ history, match,}) {
                 <section class="portfolio-section section">
                 <div class="portfolioContainer  margin-b-50">
                 <h1 className="petowner-pets">{name}'s Services & Available Dates</h1>
-                <Button onClick={() => history.push('/add-service')}> Add more services </Button>
+                
+                <Button className="email-button" onClick={() => history.push('/add-service')}> Add more services </Button>
                     {
                         services.map(i => {
                             return (
                                 // Could be good to group by service and within the own website, differentiate by time instead of the current format
                                 <div class="p-item web-design">
-                                <p>Service: {i['service']}</p>
+                                <p><b>{i['service']}</b></p>
                                 <p>Start Day/Time: {i['startdate'].slice(0, 10) + ' ' + i['startdate'].slice(11,16)}</p>
                                 <p>End Day/Time: {i['enddate'].slice(0, 10) + ' ' + i['enddate'].slice(11,16)}</p>
-                                <Button> Delete {i['service']} </Button>
+                                <Button onClick={() => deleteSelectedService(i['service'], id, i['startdate'], i['enddate'])}> Delete {i['service']} </Button>
                                 </div>
                             )
                         })
@@ -235,7 +287,7 @@ function EditProfile({ history, match,}) {
                                     <div class="p-item web-design">
                                     <p>Pet Name: {i['name']}</p>
                                     <img src={i['image1']} alt="" />
-                                    <Button> Delete - {i['name']} </Button>
+                                    <Button onClick={() => deleteSelectedPet(i['name'], id)}> Delete - {i['name']} </Button>
                                     </div>
                                 )
                             })
