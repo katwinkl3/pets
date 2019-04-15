@@ -231,8 +231,10 @@ function UserProfile({ history, match, goToAddBid}) {
                                         <Card
                                             hoverable
                                             cover={<img src={i['image1']} alt="" />}
-                                            onClick={() => history.push('/pet-profile')}
-                                        >
+                                            onClick={() => history.push({pathname:'/pet-profile', 
+                                            state:{userid:id, name: i['name'], weight: i['weight'], age:i['age'],
+                                            breed: i['breed'], type: i['pettype'], gender: i['gender'], description: i['description'],
+                                            med: i['medical_conditions'], im1: i['image1'], im2: i['image2'], im3: i['image3']}})}>
                                             <Meta 
                                             title = {i['name']}
                                             description = {i['age'] + " years old " + i['breed']}
